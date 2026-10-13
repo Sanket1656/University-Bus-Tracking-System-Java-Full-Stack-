@@ -1,0 +1,14 @@
+package com.university.bustracking.entity;
+
+public enum NotificationType {
+    TRIP_STARTED,
+    TRIP_COMPLETED,
+    PICKUP_STOP_REACHED,
+    BUS_DEACTIVATED,
+    DRIVER_DEACTIVATED,
+    ROUTE_DEACTIVATED,
+    STOP_DEACTIVATED,
+    ASSIGNMENT_DEACTIVATED,
+    PROFILE_DEACTIVATED
+}
+
