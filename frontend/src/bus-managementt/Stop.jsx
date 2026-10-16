@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '../api/apiClient';
 import { motion, AnimatePresence } from 'framer-motion';
 import StatCard from './components/StatCard';
 import Toast from './components/Toast';
@@ -9,13 +9,6 @@ import StopDetailsDrawer from './stop-components/StopDetailsDrawer';
 import DeleteStopConfirmModal from './stop-components/DeleteStopConfirmModal';
 import StopSkeletonLoader from './stop-components/StopSkeletonLoader';
 import StopEmptyState from './stop-components/StopEmptyState';
-
-const API_ROOT = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-const API_BASE = `${API_ROOT}/stop`;
-
-const getAuthHeader = () => ({
-  Authorization: `Bearer ${localStorage.getItem('token')}`,
-});
 
 const Stop = () => {
   // ─── State ────────────────────────────────────────────────────────────────
@@ -50,7 +43,7 @@ const Stop = () => {
   const fetchStops = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API_BASE}/get-all-stops`, { headers: getAuthHeader() });
+      const res = await apiClient.get('/stop/get-all-stops');
       const data = res.data.data || [];
       setStops(data);
       setFilteredStops(data);
@@ -82,10 +75,10 @@ const Stop = () => {
   const handleAddStop = async (formData) => {
     try {
       if (editStop) {
-        await axios.put(`${API_BASE}/update-stop/${editStop._id}`, formData, { headers: getAuthHeader() });
+        await apiClient.put(`/stop/update-stop/${editStop._id}`, formData);
         showToast('Stop updated successfully!', 'success');
       } else {
-        await axios.post(`${API_BASE}/stop-create`, formData, { headers: getAuthHeader() });
+        await apiClient.post('/stop/stop-create', formData);
         showToast('Stop created successfully!', 'success');
       }
       setShowAddModal(false);
@@ -102,7 +95,7 @@ const Stop = () => {
   const handleDeleteStop = async () => {
     if (deleteDependencies) return;
     try {
-      await axios.delete(`${API_BASE}/delete-stop/${stopToDelete._id}`, { headers: getAuthHeader() });
+      await apiClient.delete(`/stop/delete-stop/${stopToDelete._id}`);
       showToast('Stop deleted successfully!', 'success');
       setShowDeleteModal(false);
       setStopToDelete(null);

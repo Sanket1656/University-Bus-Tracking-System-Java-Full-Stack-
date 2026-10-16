@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '../api/apiClient';
 import { motion, AnimatePresence } from 'framer-motion';
 import StatCard from './components/StatCard';
 import Toast from './components/Toast';
@@ -9,14 +9,6 @@ import RouteDetailsDrawer from './route-components/RouteDetailsDrawer';
 import DeleteRouteConfirmModal from './route-components/DeleteRouteConfirmModal';
 import RouteSkeletonLoader from './route-components/RouteSkeletonLoader';
 import RouteEmptyState from './route-components/RouteEmptyState';
-
-const API_ROOT   = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-const ROUTE_API  = `${API_ROOT}/routes`;
-const STOP_API   = `${API_ROOT}/stop`;
-
-const getAuthHeader = () => ({
-  Authorization: `Bearer ${localStorage.getItem('token')}`,
-});
 
 const RouteManagement = () => {
   // ─── State ────────────────────────────────────────────────────────────────
@@ -52,7 +44,7 @@ const RouteManagement = () => {
   const fetchRoutes = async () => {
     setLoading(true);
     try {
-      const res  = await axios.get(`${ROUTE_API}/get-all-routes`, { headers: getAuthHeader() });
+      const res  = await apiClient.get('/routes/get-all-routes');
       const data = res.data.data || [];
       setRoutes(data);
       setFilteredRoutes(data);
@@ -67,7 +59,7 @@ const RouteManagement = () => {
 
   const fetchStops = async () => {
     try {
-      const res  = await axios.get(`${STOP_API}/get-all-stops`, { headers: getAuthHeader() });
+      const res  = await apiClient.get('/stop/get-all-stops');
       setStops(res.data.data || []);
     } catch (err) {
       console.error('Error fetching stops:', err);
@@ -98,10 +90,10 @@ const RouteManagement = () => {
   const handleAddRoute = async (formData) => {
     try {
       if (editRoute) {
-        await axios.put(`${ROUTE_API}/update-route/${editRoute._id}`, formData, { headers: getAuthHeader() });
+        await apiClient.put(`/routes/update-route/${editRoute._id}`, formData);
         showToast('Route updated successfully!', 'success');
       } else {
-        await axios.post(`${ROUTE_API}/route-create`, formData, { headers: getAuthHeader() });
+        await apiClient.post('/routes/route-create', formData);
         showToast('Route created successfully!', 'success');
       }
       setShowAddModal(false);
@@ -117,7 +109,7 @@ const RouteManagement = () => {
 
   const handleDeleteRoute = async () => {
     try {
-      await axios.delete(`${ROUTE_API}/delete-route/${routeToDelete._id}`, { headers: getAuthHeader() });
+      await apiClient.delete(`/routes/delete-route/${routeToDelete._id}`);
       showToast('Route deleted successfully!', 'success');
       setShowDeleteModal(false);
       setRouteToDelete(null);

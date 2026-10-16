@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '../api/apiClient';
 import { motion, AnimatePresence } from 'framer-motion';
 import AdminSidebar from '../pages/admin/components/AdminSidebar';
 import StatCard from './components/StatCard';
@@ -11,8 +11,6 @@ import Toast from './components/Toast';
 import SkeletonLoader from './components/SkeletonLoader';
 import EmptyState from './components/EmptyState';
 import { Outlet } from 'react-router-dom';
-
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const Bus = () => {
   // State Management
@@ -43,11 +41,7 @@ const Bus = () => {
   const fetchBuses = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API_BASE}/bus/get-all-buses`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        }
-      }); 
+      const response = await apiClient.get('/bus/get-all-buses'); 
       const busData = response.data.data || [];
       setBuses(busData);
       setFilteredBuses(busData);
@@ -117,11 +111,7 @@ const Bus = () => {
         data.append(key, formData[key]);
       }
 
-      const response = await axios.post(`${API_BASE}/bus/bus-create`, data, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        }
-      });
+      const response = await apiClient.post('/bus/bus-create', data);
 
       setBuses(prev => [...prev, response.data]);
       setShowAddModal(false);
@@ -137,11 +127,7 @@ const Bus = () => {
   // Handle Delete Bus
   const handleDeleteBus = async () => {
     try {
-      await axios.delete(`${API_BASE}/bus/delete-bus/${busToDelete._id}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        }
-      });
+      await apiClient.delete(`/bus/delete-bus/${busToDelete._id}`);
 
       setBuses(prev => prev.filter(bus => bus._id !== busToDelete._id));
       setShowDeleteModal(false);

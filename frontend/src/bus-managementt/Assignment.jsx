@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '../api/apiClient';
 import { motion, AnimatePresence } from 'framer-motion';
 import StatCard from './components/StatCard';
 import Toast from './components/Toast';
@@ -9,16 +9,6 @@ import AddAssignmentModal from './assignment-components/AddAssignmentModal';
 import DeleteAssignmentConfirmModal from './assignment-components/DeleteAssignmentConfirmModal';
 import AssignmentSkeletonLoader from './assignment-components/AssignmentSkeletonLoader';
 import AssignmentEmptyState from './assignment-components/AssignmentEmptyState';
-
-const API_BASE       = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-const ASSIGNMENT_API = `${API_BASE}/assignment`;
-const BUS_API        = `${API_BASE}/bus`;
-const DRIVER_API     = `${API_BASE}/auth`;
-const ROUTE_API      = `${API_BASE}/routes`;
-
-const getAuthHeader = () => ({
-  Authorization: `Bearer ${localStorage.getItem('token')}`,
-});
 
 const AssignmentManagement = () => {
   // ─── State ────────────────────────────────────────────────────────────────
@@ -65,7 +55,7 @@ const AssignmentManagement = () => {
   const fetchAssignments = async () => {
     setLoading(true);
     try {
-      const res  = await axios.get(`${ASSIGNMENT_API}/get-all-assignments`, { headers: getAuthHeader() });
+      const res  = await apiClient.get('/assignment/get-all-assignments');
       const data = res.data.data || [];
       setAssignments(data);
       setFilteredAssignments(data);
@@ -81,9 +71,9 @@ const AssignmentManagement = () => {
   const fetchDropdowns = async () => {
     try {
       const [busRes, driverRes, routeRes] = await Promise.all([
-        axios.get(`${BUS_API}/get-all-buses`,         { headers: getAuthHeader() }),
-        axios.get(`${DRIVER_API}/get-all-drivers`,    { headers: getAuthHeader() }),
-        axios.get(`${ROUTE_API}/get-all-routes`,      { headers: getAuthHeader() }),
+        apiClient.get('/bus/get-all-buses'),
+        apiClient.get('/auth/get-all-drivers'),
+        apiClient.get('/routes/get-all-routes'),
       ]);
       setBuses(busRes.data.data     || busRes.data     || []);
       setDrivers(driverRes.data.data || driverRes.data || []);
@@ -131,17 +121,15 @@ const AssignmentManagement = () => {
   const handleCreateAssignment = async (formData) => {
     try {
       if (editAssignment) {
-        await axios.put(
-          `${ASSIGNMENT_API}/update-assignment/${editAssignment._id}`,
-          formData,
-          { headers: getAuthHeader() }
+        await apiClient.put(
+          `/assignment/update-assignment/${editAssignment._id}`,
+          formData
         );
         showToast('Assignment updated successfully!', 'success');
       } else {
-        await axios.post(
-          `${ASSIGNMENT_API}/assignment-create`,
-          formData,
-          { headers: getAuthHeader() }
+        await apiClient.post(
+          '/assignment/assignment-create',
+          formData
         );
         showToast('Assignment created successfully!', 'success');
       }
@@ -157,9 +145,8 @@ const AssignmentManagement = () => {
 
   const handleDeleteAssignment = async () => {
     try {
-      await axios.delete(
-        `${ASSIGNMENT_API}/delete-assignment/${assignmentToDelete._id}`,
-        { headers: getAuthHeader() }
+      await apiClient.delete(
+        `/assignment/delete-assignment/${assignmentToDelete._id}`
       );
       showToast('Assignment deleted successfully!', 'success');
       setShowDeleteModal(false);

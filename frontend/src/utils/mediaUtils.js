@@ -21,10 +21,15 @@ export const resolveMediaUrl = (path) => {
     return trimmed;
   }
 
-  // Determine backend server origin from VITE_API_URL or fallback to localhost:5000
-  const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+  // Determine backend server origin from VITE_API_BASE_URL / VITE_API_URL or production/dev fallback
+  const rawApiUrl =
+    import.meta.env.VITE_API_BASE_URL ||
+    import.meta.env.VITE_API_URL ||
+    (import.meta.env.PROD
+      ? 'https://university-bus-tracking-backend.onrender.com/api'
+      : 'http://localhost:5000/api');
   // Remove trailing /api or /api/ to get backend root server URL
-  const serverOrigin = rawApiUrl.replace(/\/api\/?$/, '');
+  const serverOrigin = rawApiUrl.trim().replace(/\/api\/?$/, '');
 
   // Detect and strip legacy hardcoded localhost/127.0.0.1 ports (e.g., http://localhost:5000/uploads/...)
   // This provides safe backwards compatibility for database records saved before this migration
