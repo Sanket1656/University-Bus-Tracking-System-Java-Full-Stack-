@@ -26,8 +26,8 @@ export const resolveMediaUrl = (path) => {
     import.meta.env.VITE_API_BASE_URL ||
     import.meta.env.VITE_API_URL ||
     (import.meta.env.PROD
-      ? 'https://university-bus-tracking-backend.onrender.com/api'
-      : 'http://localhost:5000/api');
+  	? 'https://32-236-20-138.nip.io/api'
+  	: 'http://localhost:5000/api');
   // Remove trailing /api or /api/ to get backend root server URL
   const serverOrigin = rawApiUrl.trim().replace(/\/api\/?$/, '');
 

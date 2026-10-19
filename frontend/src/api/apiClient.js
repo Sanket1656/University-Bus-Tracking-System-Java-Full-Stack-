@@ -16,8 +16,8 @@ export const getApiBaseUrl = () => {
   let url = envUrl;
   if (!url || typeof url !== 'string' || !url.trim()) {
     url = import.meta.env.PROD
-      ? 'https://university-bus-tracking-backend.onrender.com/api'
-      : 'http://localhost:5000/api';
+  	? 'https://32-236-20-138.nip.io/api'
+  	: 'http://localhost:5000/api';
   }
 
   // Trim and strip all trailing slashes
